@@ -8,9 +8,7 @@ from scapy.all import sniff, IP
 import numpy as np
 import pickle
 
-# -----------------------
-# 1. معالجة البيانات
-# -----------------------
+
 def preprocess_data(input_file="network_traffic_labeled.csv"):
     data = pd.read_csv(input_file)
     data['Source'] = data['Source'].apply(lambda x: hash(x) % 10000)
@@ -25,9 +23,7 @@ def preprocess_data(input_file="network_traffic_labeled.csv"):
     X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
     return X_train_balanced, X_test, y_train_balanced, y_test
 
-# -----------------------
-# 2. بناء النموذج وتحسينه
-# -----------------------
+
 def build_model(X_train, y_train):
     param_grid = {
         'n_estimators': [50, 100, 200],
@@ -41,18 +37,14 @@ def build_model(X_train, y_train):
         pickle.dump(model, file)
     return model
 
-# -----------------------
-# 3. تقييم النموذج
-# -----------------------
+
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Model Accuracy: {accuracy * 100:.2f}%")
     print(classification_report(y_test, y_pred))
 
-# -----------------------
-# 4. تحليل حركة المرور الحية
-# -----------------------
+
 def live_traffic_analysis(model):
     def classify_packet(packet):
         if IP in packet:
@@ -67,9 +59,7 @@ def live_traffic_analysis(model):
             print(f"Packet classified as: {label}")
     sniff(prn=classify_packet, count=50)
 
-# -----------------------
-# التشغيل الرئيسي
-# -----------------------
+
 if __name__ == "__main__":
     X_train, X_test, y_train, y_test = preprocess_data()
     model = build_model(X_train, y_train)
